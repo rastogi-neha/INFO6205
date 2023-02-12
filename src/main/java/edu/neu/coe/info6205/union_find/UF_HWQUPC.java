@@ -8,6 +8,7 @@
 package edu.neu.coe.info6205.union_find;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Height-weighted Quick Union with Path Compression
@@ -82,7 +83,13 @@ public class UF_HWQUPC implements UF {
         validate(p);
         int root = p;
         // FIXME
-        // END 
+        // END
+        while (parent[root]!=root){
+            root=parent[root];
+        }
+        if(pathCompression)
+            doPathCompression(p);
+//        parent[p]=root;
         return root;
     }
 
@@ -170,14 +177,58 @@ public class UF_HWQUPC implements UF {
 
     private void mergeComponents(int i, int j) {
         // FIXME make shorter root point to taller one
-        // END 
+        // END
+        if(i==j)return;
+        if(height[i]<height[j])parent[i]=j;
+        else if(height[i]>height[j])parent[j]=i;
+        else{
+            parent[j]=i;
+            height[i]++;
+        }
+        //count--;
     }
 
     /**
      * This implements the single-pass path-halving mechanism of path compression
      */
     private void doPathCompression(int i) {
+        int root=i;
+        while (parent[root]!=root) {
+            root = parent[root];
+        }
+        parent[i]=root;
+
         // FIXME update parent to value of grandparent
         // END 
+    }
+
+    static int count(int n){
+        Random random = new Random();
+        UF_HWQUPC obj=new UF_HWQUPC(n);
+        int p,q,noOfPairs=0;
+        while(obj.count!=1) {
+            p= random.nextInt(n);
+            q= random.nextInt(n);
+            noOfPairs++;
+            if (!obj.connected(p, q)) {
+                obj.union(p, q);
+            }
+        }
+    return noOfPairs;
+    }
+
+    public static void main(String[] args){
+        int j,n,runs=1000;
+        for(n=50;n<=3200;n=n*2){
+            int m,result=0;
+            for(j=1;j<=runs;j++){
+                m=count(n);
+                result+=m;
+            }
+            result=result/runs;
+            System.out.println("For N="+n+" the number of connections on average is "+ result);
+            //System.out.println(n+" , "+result);
+        }
+
     }
 }
